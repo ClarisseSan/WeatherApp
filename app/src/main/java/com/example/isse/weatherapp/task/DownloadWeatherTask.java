@@ -21,8 +21,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
-import static com.example.isse.weatherapp.data.WeatherProvider.haha;
+import android.text.format.Time;
 
 
 /**
@@ -149,6 +154,8 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         String icon = null;
 
 
+
+
         try {
             JSONObject forecastJson = new JSONObject(jsonString);
 
@@ -156,7 +163,19 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, "CITY --->" + city);
             JSONArray list = forecastJson.getJSONArray("list");
 
+            //Using the Gregorian Calendar Class instead of Time Class to get current date
+            Calendar gc = new GregorianCalendar();
+            String day;
+
             for (int i = 0; i < list.length(); i++) {
+
+                //Converting the integer value returned by Calendar.DAY_OF_WEEK to
+                //a human-readable String
+                day = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+
+                //iterating to the next day
+                gc.add(Calendar.DAY_OF_WEEK, 1);
+
                 JSONObject dayForecast = list.getJSONObject(i);
 
                 JSONObject temp = dayForecast.getJSONObject("temp");
@@ -186,8 +205,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
 
                 // Then add the data, along with the corresponding name of the data type,
                 // so the content provider knows what kind of value is being inserted.
-                values.put(WeatherContract.WeatherEntry.COLUMN_DAY, "Wednesday");
-                values.put(WeatherContract.WeatherEntry.COLUMN_DATE, "05/10/2016");
+                values.put(WeatherContract.WeatherEntry.COLUMN_DAY, day);
                 values.put(WeatherContract.WeatherEntry.COLUMN_DESCRIPTION, description);
                 values.put(WeatherContract.WeatherEntry.COLUMN_HIGH, max);
                 values.put(WeatherContract.WeatherEntry.COLUMN_LOW, min);
@@ -195,7 +213,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
 
                 mContext.getContentResolver().insert(WeatherContract.WeatherEntry.CONTENT_URI, values);
-
             }
 
 
@@ -205,4 +222,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         }
 
     }
+
+
+
 }

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class WeatherDbHelper extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "weather.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER DEFAULT 0";
@@ -20,7 +20,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper{
             "CREATE TABLE " + WeatherContract.WeatherEntry.TABLE_WEATHER + " (" +
                     WeatherContract.WeatherEntry._ID + " INTEGER PRIMARY KEY," +
                     WeatherContract.WeatherEntry.COLUMN_DAY + TEXT_TYPE + COMMA_SEP +
-                    WeatherContract.WeatherEntry.COLUMN_DATE + TEXT_TYPE + COMMA_SEP +
                     WeatherContract.WeatherEntry.COLUMN_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
                     WeatherContract.WeatherEntry.COLUMN_HIGH + TEXT_TYPE + COMMA_SEP +
                     WeatherContract.WeatherEntry.COLUMN_LOW + TEXT_TYPE + COMMA_SEP +

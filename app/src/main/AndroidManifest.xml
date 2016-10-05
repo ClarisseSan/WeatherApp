@@ -57,8 +57,10 @@
         </service>
         <service android:name=".service.WeatherIntentService" />
         <provider
-            android:authorities=".data.WeatherProvider"
-            android:name=".data.WeatherProvider"/>
+            android:authorities="com.example.isse.weatherapp"
+            android:name=".data.WeatherProvider"
+            android:exported="false"
+            android:syncable="true"/>
 
     </application>
 

@@ -27,7 +27,6 @@ public class WeatherContract {
         //DETAIL TABLE
         public static final String TABLE_WEATHER = "weather_tbl";
         public static final String COLUMN_DAY = "day";
-        public static final String COLUMN_DATE = "date";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_HIGH = "high";
         public static final String COLUMN_LOW = "low";
