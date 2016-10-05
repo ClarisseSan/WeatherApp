@@ -56,6 +56,9 @@
             </intent-filter>
         </service>
         <service android:name=".service.WeatherIntentService" />
+        <provider
+            android:authorities=".data.WeatherProvider"
+            android:name=".data.WeatherProvider"/>
 
     </application>
 
