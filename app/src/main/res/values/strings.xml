@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SG Weather</string>
+    <string name="title_weather_detail">Weather Detail</string>
+    <string name="unsupported_device">This device is not supported.</string>
+    <string name="network_toast">This app requires an internet connection</string>
+    <string name="content_authority">com.example.isse.weatherapp.data.WeatherProvider</string>
+</resources>
