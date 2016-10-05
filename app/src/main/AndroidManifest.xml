@@ -56,9 +56,6 @@
             </intent-filter>
         </service>
         <service android:name=".service.WeatherIntentService" />
-        <service android:name=".gps.GPS_Service"/>
-
-
 
     </application>
 
