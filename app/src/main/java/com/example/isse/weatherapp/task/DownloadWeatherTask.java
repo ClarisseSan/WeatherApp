@@ -1,14 +1,12 @@
 package com.example.isse.weatherapp.task;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.text.format.Time;
 import android.util.Log;
 
+import com.example.isse.weatherapp.data.WeatherContract;
 import com.example.isse.weatherapp.utility.Utility;
 
 import org.json.JSONArray;
@@ -23,7 +21,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Vector;
+
+import static com.example.isse.weatherapp.data.WeatherProvider.haha;
 
 
 /**
@@ -51,7 +50,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         // Will contain the raw JSON response as a string.
         String forecastJsonStr = null;
 
-        try{
+        try {
             //"http://api.openweathermap.org/data/2.5/forecast/daily?lat=35&lon=139&cnt=10&mode=json&appid=ee3eae518914dcd05823d45966b449c3"
             final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
 
@@ -78,7 +77,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                     .appendQueryParameter(LONGITUDE, LON)
                     .appendQueryParameter(COUNT, CNT)
                     .appendQueryParameter(MODE, JSON)
-                    .appendQueryParameter(UNITS,UNT)
+                    .appendQueryParameter(UNITS, UNT)
                     .appendQueryParameter(APP_ID, KEY_REF)
                     .build();
 
@@ -140,42 +139,67 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    private void getForecastFromJSON(String jsonString) throws JSONException{
+    private void getForecastFromJSON(String jsonString) throws JSONException {
 
-        try{
+        //weather data variables
+        String min;
+        String max;
+        int humidity;
+        String description = null;
+        String icon = null;
+
+
+        try {
             JSONObject forecastJson = new JSONObject(jsonString);
 
             String city = forecastJson.getJSONObject("city").getString("name");
-            Log.e(LOG_TAG, "CITY --->"+ city);
+            Log.e(LOG_TAG, "CITY --->" + city);
             JSONArray list = forecastJson.getJSONArray("list");
 
-            for(int i = 0; i < list.length(); i++){
-            JSONObject dayForecast = list.getJSONObject(i);
+            for (int i = 0; i < list.length(); i++) {
+                JSONObject dayForecast = list.getJSONObject(i);
 
                 JSONObject temp = dayForecast.getJSONObject("temp");
-                Double min = temp.getDouble("min");
-                Log.e(LOG_TAG, "MIN --->"+ min.toString());
+                min = String.valueOf(temp.getDouble("min"));
+                Log.e(LOG_TAG, "MIN --->" + min.toString());
 
-                Double max = temp.getDouble("max");
-                Log.e(LOG_TAG, "MAX --->"+ max.toString());
+                max = String.valueOf(temp.getDouble("max"));
+                Log.e(LOG_TAG, "MAX --->" + max.toString());
 
-                int humidity = dayForecast.getInt("humidity");
-                Log.e(LOG_TAG, "HUMIDITY --->"+ String.valueOf(humidity));
+                humidity = dayForecast.getInt("humidity");
+                Log.e(LOG_TAG, "HUMIDITY --->" + String.valueOf(humidity));
 
                 JSONArray weather = dayForecast.getJSONArray("weather");
-                for(int j=0;j<weather.length();j++){
+                for (int j = 0; j < weather.length(); j++) {
                     JSONObject obj = weather.getJSONObject(j);
-                    String description = obj.getString("description");
-                    Log.e(LOG_TAG, "DESCRIPTION --->"+ description);
+                    description = obj.getString("description");
+                    Log.e(LOG_TAG, "DESCRIPTION --->" + description);
 
-                    String icon = obj.getString("icon");
-                    Log.e(LOG_TAG, "ICON --->"+ icon);
+                    icon = obj.getString("icon");
+                    Log.e(LOG_TAG, "ICON --->" + icon);
+
                 }
+
+                // Now that the content provider is set up, inserting rows of data is pretty simple.
+                // First create a ContentValues object to hold the data you want to insert.
+                ContentValues values = new ContentValues();
+
+                // Then add the data, along with the corresponding name of the data type,
+                // so the content provider knows what kind of value is being inserted.
+                values.put(WeatherContract.WeatherEntry.COLUMN_DAY, "Wednesday");
+                values.put(WeatherContract.WeatherEntry.COLUMN_DATE, "05/10/2016");
+                values.put(WeatherContract.WeatherEntry.COLUMN_DESCRIPTION, description);
+                values.put(WeatherContract.WeatherEntry.COLUMN_HIGH, max);
+                values.put(WeatherContract.WeatherEntry.COLUMN_LOW, min);
+                values.put(WeatherContract.WeatherEntry.COLUMN_ICON, icon);
+                values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
+
+                mContext.getContentResolver().insert(WeatherContract.WeatherEntry.CONTENT_URI, values);
 
             }
 
 
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }

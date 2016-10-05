@@ -28,9 +28,8 @@ import android.widget.Toast;
 
 
 import com.example.isse.weatherapp.R;
+import com.example.isse.weatherapp.data.WeatherDbHelper;
 import com.example.isse.weatherapp.dummy.DummyContent;
-import com.example.isse.weatherapp.gps.GPSTracker;
-import com.example.isse.weatherapp.gps.GPS_Service;
 import com.example.isse.weatherapp.service.WeatherIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -73,6 +72,7 @@ public class WeatherListActivity extends AppCompatActivity  {
 
         mContext = this;
 
+
         //for internet connection purposes
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -80,9 +80,6 @@ public class WeatherListActivity extends AppCompatActivity  {
 
         checkPlayServices();
 
-        //get coordinates
-        Intent i =new Intent(this,GPS_Service.class);
-        startService(i);
 
         // The intent service is for executing immediate pulls from the Weather API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
