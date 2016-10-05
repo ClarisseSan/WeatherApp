@@ -21,13 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-
-import android.text.format.Time;
 
 
 /**
@@ -154,8 +150,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         String icon = null;
 
 
-
-
         try {
             JSONObject forecastJson = new JSONObject(jsonString);
 
@@ -163,7 +157,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, "CITY --->" + city);
             JSONArray list = forecastJson.getJSONArray("list");
 
-            //Using the Gregorian Calendar Class instead of Time Class to get current date
+            //Using the Gregorian Calendar Class to get current date
             Calendar gc = new GregorianCalendar();
             String day;
 
@@ -222,7 +216,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         }
 
     }
-
 
 
 }

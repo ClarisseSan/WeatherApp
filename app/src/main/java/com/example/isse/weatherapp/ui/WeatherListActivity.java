@@ -2,12 +2,16 @@ package com.example.isse.weatherapp.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,12 +22,19 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.isse.weatherapp.R;
+import com.example.isse.weatherapp.adapter.MyWeatherCursorAdapter;
+import com.example.isse.weatherapp.data.WeatherContract;
+import com.example.isse.weatherapp.data.WeatherProvider;
 import com.example.isse.weatherapp.dummy.DummyContent;
 import com.example.isse.weatherapp.service.WeatherIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import android.app.LoaderManager.LoaderCallbacks;
+
 import java.util.List;
+
+import static android.R.attr.data;
 
 /**
  * An activity representing a list of Weather. This activity
@@ -33,9 +44,10 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class WeatherListActivity extends AppCompatActivity {
+public class WeatherListActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
 
+    private static final int CURSOR_LOADER_ID = 0;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -43,10 +55,12 @@ public class WeatherListActivity extends AppCompatActivity {
     private boolean mTwoPane;
 
     private Context mContext;
+    private MyWeatherCursorAdapter mCursorAdapter;
     private Intent mServiceIntent;
     private boolean isConnected;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private final String LOG_TAG = WeatherListActivity.class.getSimpleName();
+    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +81,10 @@ public class WeatherListActivity extends AppCompatActivity {
 
         checkPlayServices();
 
+        //initialize cursor loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        mCursorAdapter = new MyWeatherCursorAdapter(this, null);
 
         // The intent service is for executing immediate pulls from the Weather API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
@@ -98,6 +116,12 @@ public class WeatherListActivity extends AppCompatActivity {
         Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    }
+
     /**
      * Check the device to make sure it has the Google Play Services APK. If
      * it doesn't, display a dialog that allows users to download the APK from
@@ -121,7 +145,31 @@ public class WeatherListActivity extends AppCompatActivity {
 
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        recyclerView.setAdapter(mCursorAdapter);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(this, WeatherContract.WeatherEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCursorAdapter.swapCursor(data);
+        mCursor = data;
+
+        //TODO notify user of an empty view
+        //updateEmptyView();
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCursorAdapter.swapCursor(null);
     }
 
     public class SimpleItemRecyclerViewAdapter
