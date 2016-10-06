@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 /**
  * Created by isse on 05/10/2016.
@@ -13,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
  */
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
+    private final View mEmptyView;
     private Context mContext;
 
     private Cursor mCursor;
@@ -23,7 +25,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 
     private DataSetObserver mDataSetObserver;
 
-    public CursorRecyclerViewAdapter(Context context, Cursor cursor) {
+    public CursorRecyclerViewAdapter(Context context, Cursor cursor, View emptyView) {
         mContext = context;
         mCursor = cursor;
         mDataValid = cursor != null;
@@ -32,6 +34,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
+        mEmptyView = emptyView;
     }
 
     public Cursor getCursor() {
@@ -104,10 +107,13 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
             mDataValid = true;
             notifyDataSetChanged();
+            mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+
         } else {
             mRowIdColumn = -1;
             mDataValid = false;
             notifyDataSetChanged();
+            mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
         return oldCursor;

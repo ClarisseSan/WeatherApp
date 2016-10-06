@@ -21,8 +21,8 @@ import com.example.isse.weatherapp.data.WeatherContract.WeatherEntry;
 public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherCursorAdapter.ViewHolder> {
     private Context mContext;
 
-    public MyWeatherCursorAdapter(Context context, Cursor cursor){
-        super(context,cursor);
+    public MyWeatherCursorAdapter(Context context, Cursor cursor, View emptyView){
+        super(context,cursor,emptyView);
         mContext = context;
     }
 

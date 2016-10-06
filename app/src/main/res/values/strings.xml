@@ -4,4 +4,6 @@
     <string name="unsupported_device">This device is not supported.</string>
     <string name="network_toast">This app requires an internet connection</string>
     <string name="content_authority">com.example.isse.weatherapp.data.WeatherProvider</string>
+    <string name="empty_weather_list">No weather information available. The server is not returning data.</string>
+    <string name="empty_list_no_network">No weather information available. The network is not available to fetch weather.</string>
 </resources>

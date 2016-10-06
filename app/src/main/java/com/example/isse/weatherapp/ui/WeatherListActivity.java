@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.isse.weatherapp.R;
@@ -81,10 +82,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         checkPlayServices();
 
-        //initialize cursor loader
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-
-        mCursorAdapter = new MyWeatherCursorAdapter(this, null);
 
         // The intent service is for executing immediate pulls from the Weather API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
@@ -99,7 +96,16 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             }
         }
 
+        //initialize cursor loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
         View recyclerView = findViewById(R.id.weather_list);
+
+        //set empty view
+        View emptyView = findViewById(R.id.recyclerview_weather_empty);
+
+        mCursorAdapter = new MyWeatherCursorAdapter(this, null, emptyView);
+
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
@@ -162,9 +168,30 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         mCursorAdapter.swapCursor(data);
         mCursor = data;
 
-        //TODO notify user of an empty view
-        //updateEmptyView();
+        //notify user of an empty view
+        updateEmptyView();
 
+    }
+
+    /*
+        Updates the empty list view with contextually relevant information that the user can
+        use to determine why they aren't seeing weather.
+     */
+    private void updateEmptyView() {
+        if (mCursorAdapter.getItemCount() == 0) {
+            TextView tv = (TextView) findViewById(R.id.recyclerview_weather_empty);
+            if (null != tv) {
+                int message;
+                if (!isConnected) {
+                    //network is not available
+                    message = R.string.empty_list_no_network;
+                } else {
+                    //network is available but still doesn't fetch data
+                    message = R.string.empty_weather_list;
+                }
+                tv.setText(message);
+            }
+        }
     }
 
     @Override
