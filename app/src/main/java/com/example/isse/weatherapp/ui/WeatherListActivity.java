@@ -194,6 +194,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 //            holder.mIdView.setText(mValues.get(position).id);
 //            holder.mContentView.setText(mValues.get(position).content);
 
+
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

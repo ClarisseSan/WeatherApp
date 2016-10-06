@@ -1,6 +1,7 @@
 package com.example.isse.weatherapp.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.Image;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +19,11 @@ import com.example.isse.weatherapp.data.WeatherContract.WeatherEntry;
  */
 
 public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherCursorAdapter.ViewHolder> {
+    private Context mContext;
+
     public MyWeatherCursorAdapter(Context context, Cursor cursor){
         super(context,cursor);
+        mContext = context;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -48,11 +52,21 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
-        //TODO include image view
+        final String DEGREE  = "\u00b0";
+
         viewHolder.txtDay.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DAY)));
         viewHolder.txtForecast.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESCRIPTION)));
-        viewHolder.txtHigh.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH)));
-        viewHolder.txtLow.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW)));
-        }
+        viewHolder.txtHigh.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH)) + DEGREE);
+        viewHolder.txtLow.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW)) + DEGREE);
+
+        //set icon image
+        final String prefix = "ic_";
+        String icon_id = prefix + cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON));
+        Resources res = mContext.getResources();
+        int resourceId = res.getIdentifier(icon_id, "drawable", mContext.getPackageName() );
+        viewHolder.imgIcon.setImageResource( resourceId );
+
+
+    }
 
 }
