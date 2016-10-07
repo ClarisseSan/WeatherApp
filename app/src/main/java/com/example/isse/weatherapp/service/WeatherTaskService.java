@@ -23,24 +23,25 @@ public class WeatherTaskService extends GcmTaskService {
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        if (taskParams.getTag().equals("init")) {
+        //get extras from intent service
+        String latitude = taskParams.getExtras().getString("lat");
+        String longitude = taskParams.getExtras().getString("long");
 
-            //update weather forecast by
-            //deleting all forecast data in database then load it again.
+        //update weather forecast by
+        //deleting all forecast data in database then load it again.
 
-            Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null);
+        Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
 
-            if (cursor != null) {
-                mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
-            }
-            DownloadWeatherTask downloadWeatherTask = new DownloadWeatherTask(mContext);
-            downloadWeatherTask.execute();
-
+        if (cursor != null) {
+            mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
         }
+        DownloadWeatherTask downloadWeatherTask = new DownloadWeatherTask(mContext, latitude, longitude);
+        downloadWeatherTask.execute();
+
         return 0;
     }
 }

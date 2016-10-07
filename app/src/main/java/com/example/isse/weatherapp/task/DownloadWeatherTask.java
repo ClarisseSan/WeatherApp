@@ -34,9 +34,13 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
 
     private static final String LOG_TAG = DownloadWeatherTask.class.getSimpleName();
     private Context mContext;
+    private String mLatitude;
+    private String mLongitude;
 
-    public DownloadWeatherTask(Context context) {
+    public DownloadWeatherTask(Context context, String latitude, String longitude) {
         this.mContext = context;
+        this.mLatitude = latitude;
+        this.mLongitude = longitude;
     }
 
     @Override
@@ -65,8 +69,16 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
             final String UNITS = "units";
 
             //values for parameters
-            final String LAT = "1.29";
-            final String LON = "103.85";
+
+//            final String LAT = "1.29";
+//            final String LON = "103.85";
+
+            final String LAT = mLatitude;
+            final String LON = mLongitude;
+
+            Log.i(LOG_TAG, "latitude --> " + LAT);
+            Log.i(LOG_TAG, "longitude --> " + LON);
+
             final String CNT = "10";
             final String JSON = "json";
             final String UNT = "metric";

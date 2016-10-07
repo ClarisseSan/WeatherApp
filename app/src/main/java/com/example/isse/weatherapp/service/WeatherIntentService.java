@@ -21,10 +21,17 @@ public class WeatherIntentService extends IntentService{
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        String latitude = intent.getStringExtra("lat");
+        String longitude = intent.getStringExtra("long");
+
+        Bundle args = new Bundle();
+        args.putString("lat", latitude);
+        args.putString("long", longitude);
+
         Log.d(WeatherIntentService.class.getSimpleName(), "Weather Intent Service");
         WeatherTaskService weatherTaskService = new WeatherTaskService(this);
         // We can call OnRunTask from the intent service to force it to run immediately instead of
         // scheduling a task.
-        weatherTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag")));
+        weatherTaskService.onRunTask(new TaskParams("args", args));
     }
 }

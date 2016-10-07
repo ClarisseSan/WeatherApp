@@ -1,41 +1,37 @@
 package com.example.isse.weatherapp.ui;
 
-import android.content.BroadcastReceiver;
+import android.Manifest;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.adapter.MyWeatherCursorAdapter;
 import com.example.isse.weatherapp.data.WeatherContract;
-import com.example.isse.weatherapp.data.WeatherProvider;
-import com.example.isse.weatherapp.dummy.DummyContent;
 import com.example.isse.weatherapp.service.WeatherIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import android.app.LoaderManager.LoaderCallbacks;
-
 import java.util.List;
-
-import static android.R.attr.data;
 
 /**
  * An activity representing a list of Weather. This activity
@@ -49,19 +45,21 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
 
     private static final int CURSOR_LOADER_ID = 0;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private final String LOG_TAG = WeatherListActivity.class.getSimpleName();
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
-
     private Context mContext;
     private MyWeatherCursorAdapter mCursorAdapter;
     private Intent mServiceIntent;
     private boolean isConnected;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private final String LOG_TAG = WeatherListActivity.class.getSimpleName();
     private Cursor mCursor;
+
+    private String longitude;
+    private String latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +72,13 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         mContext = this;
 
+        if (findViewById(R.id.weather_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
 
         //for internet connection purposes
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -82,13 +87,15 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         checkPlayServices();
 
+        setCoordinates();
+
 
         // The intent service is for executing immediate pulls from the Weather API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
         mServiceIntent = new Intent(this, WeatherIntentService.class);
         if (savedInstanceState == null) {
-            // Run the initialize task service so that some forecasts appear upon an empty database
-            mServiceIntent.putExtra("tag", "init");
+            mServiceIntent.putExtra("lat", latitude);
+            mServiceIntent.putExtra("long", longitude);
             if (isConnected) {
                 startService(mServiceIntent);
             } else {
@@ -96,26 +103,28 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             }
         }
 
-        //initialize cursor loader
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-        View recyclerView = findViewById(R.id.weather_list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.weather_list);
 
         //set empty view
         View emptyView = findViewById(R.id.recyclerview_weather_empty);
 
-        mCursorAdapter = new MyWeatherCursorAdapter(this, null, emptyView);
+        //get the fragment manager
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        mCursorAdapter = new MyWeatherCursorAdapter(this, null, emptyView, mTwoPane, fragmentManager);
 
-        if (findViewById(R.id.weather_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
+        if (recyclerView != null) {
+            setupRecyclerView(recyclerView);
         }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //initialize cursor loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
     private void networkToast() {
@@ -173,6 +182,36 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     }
 
+    public void setCoordinates() {
+
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        List<String> p = locationManager.getProviders(true);
+        Location loc = null;
+        for (String s : p) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            if (locationManager.getLastKnownLocation(s) != null) {
+                if (loc == null || locationManager.getLastKnownLocation(s).getAccuracy() < loc.getAccuracy()) {
+                    loc = locationManager.getLastKnownLocation(s);
+                }
+            }
+        }
+        latitude = String.valueOf(loc.getLatitude());
+        longitude = String.valueOf(loc.getLongitude());
+
+        Log.e(LOG_TAG, "Lat ----->" + latitude);
+        Log.e(LOG_TAG, "Long ----->" + longitude);
+
+    }
+
     /*
         Updates the empty list view with contextually relevant information that the user can
         use to determine why they aren't seeing weather.
@@ -199,73 +238,5 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         mCursorAdapter.swapCursor(null);
     }
 
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
-
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.weather_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-//            holder.mIdView.setText(mValues.get(position).id);
-//            holder.mContentView.setText(mValues.get(position).content);
-
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(WeatherDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        WeatherDetailFragment fragment = new WeatherDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.weather_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, WeatherDetailActivity.class);
-                        intent.putExtra(WeatherDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
-                        context.startActivity(intent);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public final View mView;
-            //public final TextView mIdView;
-            //public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                //mIdView = (TextView) view.findViewById(R.id.id);
-                //mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-//            @Override
-//            public String toString() {
-//                //return super.toString() + " '" + mContentView.getText() + "'";
-//            }
-        }
-    }
 }
