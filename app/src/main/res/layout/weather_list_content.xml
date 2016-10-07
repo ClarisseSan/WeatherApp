@@ -33,6 +33,14 @@
             android:hint="Wednesday"/>
 
         <TextView
+            android:id="@+id/txt_date_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="15sp"
+            android:hint="Oct 1"/>
+
+        <TextView
             android:id="@+id/txt_forecast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

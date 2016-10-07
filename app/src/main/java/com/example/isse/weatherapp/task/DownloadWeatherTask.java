@@ -21,7 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -158,8 +160,14 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         String min;
         String max;
         int humidity;
+        double rain;
+        double wind;
         String description = null;
         String icon = null;
+        String temp_day;
+        String temp_eve;
+        String temp_mor;
+        String temp_night;
 
 
         try {
@@ -172,15 +180,24 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
             //Using the Gregorian Calendar Class to get current date
             Calendar gc = new GregorianCalendar();
             String day;
+            String myDate;
 
             for (int i = 0; i < list.length(); i++) {
 
                 //Converting the integer value returned by Calendar.DAY_OF_WEEK to
                 //a human-readable String
                 day = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-
                 //iterating to the next day
                 gc.add(Calendar.DAY_OF_WEEK, 1);
+
+
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date()); // Now use today date.
+                c.add(Calendar.DATE, i); // Adding 5 days
+                myDate = sdf.format(c.getTime());
+
+                Log.e(LOG_TAG, "DATE --->" + myDate);
 
                 JSONObject dayForecast = list.getJSONObject(i);
 
@@ -191,8 +208,34 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 max = String.valueOf(temp.getDouble("max"));
                 Log.e(LOG_TAG, "MAX --->" + max.toString());
 
+                //----------------------------------------
+                temp_day = String.valueOf(temp.getDouble("day"));
+                Log.e(LOG_TAG, "TEMP_DAY --->" + temp_day.toString());
+
+                temp_night = String.valueOf(temp.getDouble("night"));
+                Log.e(LOG_TAG, "TEMP_NIGHT --->" + temp_night.toString());
+
+                temp_eve = String.valueOf(temp.getDouble("eve"));
+                Log.e(LOG_TAG, "TEMP_EVE --->" + temp_eve.toString());
+
+                temp_mor = String.valueOf(temp.getDouble("morn"));
+                Log.e(LOG_TAG, "TEMP_MORN --->" + temp_mor.toString());
+
+                //---------------------------------------
+
                 humidity = dayForecast.getInt("humidity");
                 Log.e(LOG_TAG, "HUMIDITY --->" + String.valueOf(humidity));
+
+                //sometimes rain is not available on API
+                if(dayForecast.has("rain")) {
+                    rain = dayForecast.getDouble("rain");
+                }else{
+                    rain = 0;
+                }
+                Log.e(LOG_TAG, "RAIN --->" + String.valueOf(rain));
+
+                wind = dayForecast.getInt("speed");
+                Log.e(LOG_TAG, "WIND --->" + String.valueOf(wind));
 
                 JSONArray weather = dayForecast.getJSONArray("weather");
                 for (int j = 0; j < weather.length(); j++) {
@@ -212,11 +255,20 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 // Then add the data, along with the corresponding name of the data type,
                 // so the content provider knows what kind of value is being inserted.
                 values.put(WeatherContract.WeatherEntry.COLUMN_DAY, day);
+                values.put(WeatherContract.WeatherEntry.COLUMN_DATE, myDate);
                 values.put(WeatherContract.WeatherEntry.COLUMN_DESCRIPTION, description);
                 values.put(WeatherContract.WeatherEntry.COLUMN_HIGH, max);
                 values.put(WeatherContract.WeatherEntry.COLUMN_LOW, min);
+
+                values.put(WeatherContract.WeatherEntry.COLUMN_TEMP_DAY, temp_day);
+                values.put(WeatherContract.WeatherEntry.COLUMN_TEMP_EVENING, temp_eve);
+                values.put(WeatherContract.WeatherEntry.COLUMN_TEMP_MORNING, temp_mor);
+                values.put(WeatherContract.WeatherEntry.COLUMN_TEMP_NIGHT, temp_night);
+
                 values.put(WeatherContract.WeatherEntry.COLUMN_ICON, icon);
                 values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
+                values.put(WeatherContract.WeatherEntry.COLUMN_RAIN, String.valueOf(rain));
+                values.put(WeatherContract.WeatherEntry.COLUMN_WIND, String.valueOf(wind));
 
                 mContext.getContentResolver().insert(WeatherContract.WeatherEntry.CONTENT_URI, values);
             }

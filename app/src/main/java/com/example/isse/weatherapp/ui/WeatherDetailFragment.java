@@ -49,7 +49,13 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     private TextView txtDescription;
     private TextView txtHigh;
     private TextView txtLow;
+    private TextView txtTempDay;
+    private TextView txtTempEve;
+    private TextView txtTempMorn;
+    private TextView txtTempNight;
     private TextView txtHumidity;
+    private TextView txtRain;
+    private TextView txtWind;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -101,7 +107,15 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
         txtDescription = (TextView) rootView.findViewById(R.id.txt_weather_description);
         txtHigh = (TextView) rootView.findViewById(R.id.txt_weather_high);
         txtLow = (TextView) rootView.findViewById(R.id.txt_weather_low);
+
+        txtTempDay = (TextView) rootView.findViewById(R.id.txt_temp_day);
+        txtTempEve = (TextView) rootView.findViewById(R.id.txt_temp_eve);
+        txtTempMorn = (TextView) rootView.findViewById(R.id.txt_temp_morn);
+        txtTempNight = (TextView) rootView.findViewById(R.id.txt_temp_night);
+
         txtHumidity = (TextView) rootView.findViewById(R.id.txt_humidity);
+        txtRain = (TextView) rootView.findViewById(R.id.txt_rain);
+        txtWind = (TextView) rootView.findViewById(R.id.txt_wind);
 
         return rootView;
     }
@@ -132,15 +146,32 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
             String description = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESCRIPTION));
             String high = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH));
             String low = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW));
+            String temp_morn = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MORNING));
+            String temp_night = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_NIGHT));
+            String temp_eve = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_EVENING));
+            String temp_day = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_DAY));
             String icon = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON));
             String humidity = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY));
+            String rain = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
+            String wind = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_WIND));
 
             //set values to views
-            txtDay.setText(day);
-            txtDescription.setText(description);
-            txtHigh.setText(high);
-            txtLow.setText(low);
-            txtHumidity.setText(humidity);
+            txtDay.setText("Day: " + day);
+
+            txtDescription.setText("Description: " + description);
+            txtHigh.setText("High: " + high);
+            txtLow.setText("Low: " + low);
+
+            txtTempNight.setText("NIGHT TEMP: " + temp_night);
+            txtTempMorn.setText("MORNING TEMP: " + temp_morn);
+            txtTempDay.setText("DAY TEMP: " + temp_day);
+            txtTempEve.setText("EVENING TEMP: " + temp_eve);
+
+            txtHumidity.setText("Humidity: " + humidity);
+            txtRain.setText("Rain: " + rain);
+            txtWind.setText("Wind: " + wind);
+
+
             //set icon image
             final String prefix = "ic_";
             Resources res = mContext.getResources();

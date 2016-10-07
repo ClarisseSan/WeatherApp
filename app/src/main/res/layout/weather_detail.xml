@@ -44,7 +44,18 @@ tools:context="com.example.isse.weatherapp.ui.WeatherDetailFragment">
         android:paddingLeft="5dp"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <TextView
+    <TextView
+        android:id="@+id/txt_weather_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="October 07"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+
+    <TextView
             android:id="@+id/txt_weather_high"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,10 +76,70 @@ tools:context="com.example.isse.weatherapp.ui.WeatherDetailFragment">
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <TextView
+        android:id="@+id/txt_temp_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="DAY TEMP"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+    <TextView
+        android:id="@+id/txt_temp_morn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="MORNING TEMP"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/txt_temp_eve"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="EVE TEMP"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+
+    <TextView
+        android:id="@+id/txt_temp_night"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="NIGHT TEMP"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
         android:id="@+id/txt_humidity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Humidity"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/txt_rain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="rain"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/txt_wind"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="wind"
         android:layout_marginLeft="16dp"
         android:paddingTop="16dp"
         android:paddingLeft="5dp"

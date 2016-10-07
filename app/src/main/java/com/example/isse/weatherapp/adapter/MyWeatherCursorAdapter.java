@@ -39,6 +39,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
         public View mView;
         public ImageView imgIcon;
         public TextView txtDay;
+        private TextView txtDate;
         public TextView txtForecast;
         public TextView txtHigh;
         public TextView txtLow;
@@ -48,6 +49,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
             mView = view;
             imgIcon = (ImageView) view.findViewById(R.id.img_icon);
             txtDay = (TextView) view.findViewById(R.id.txt_date);
+            txtDate = (TextView) view.findViewById(R.id.txt_date_2);
             txtForecast = (TextView) view.findViewById(R.id.txt_forecast);
             txtHigh = (TextView) view.findViewById(R.id.txt_high_temp);
             txtLow = (TextView) view.findViewById(R.id.txt_low_temp);
@@ -68,6 +70,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
         final String id = String.valueOf(cursor.getInt(cursor.getColumnIndex(WeatherEntry._ID)));
 
         viewHolder.txtDay.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DAY)));
+        viewHolder.txtDate.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE)));
         viewHolder.txtForecast.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESCRIPTION)));
         viewHolder.txtHigh.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH)) + DEGREE);
         viewHolder.txtLow.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW)) + DEGREE);

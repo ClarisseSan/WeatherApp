@@ -27,11 +27,19 @@ public class WeatherContract {
         //DETAIL TABLE
         public static final String TABLE_WEATHER = "weather_tbl";
         public static final String COLUMN_DAY = "day";
+        public static final String COLUMN_DATE = "date";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_HIGH = "high";
         public static final String COLUMN_LOW = "low";
+        public static final String COLUMN_TEMP_DAY = "temp_day";
+        public static final String COLUMN_TEMP_NIGHT = "temp_night";
+        public static final String COLUMN_TEMP_EVENING = "temp_evening";
+        public static final String COLUMN_TEMP_MORNING = "temp_morning";
         public static final String COLUMN_ICON = "icon";
         public static final String COLUMN_HUMIDITY = "humidity";
+        public static final String COLUMN_RAIN = "rain";
+        public static final String COLUMN_WIND = "wind";
+
 
 
         // create content uri
