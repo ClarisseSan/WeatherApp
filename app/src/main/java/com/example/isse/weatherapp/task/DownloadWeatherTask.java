@@ -194,7 +194,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd");
                 Calendar c = Calendar.getInstance();
                 c.setTime(new Date()); // Now use today date.
-                c.add(Calendar.DATE, i); // Adding 5 days
+                c.add(Calendar.DATE, i); // Adding a day
                 myDate = sdf.format(c.getTime());
 
                 Log.e(LOG_TAG, "DATE --->" + myDate);

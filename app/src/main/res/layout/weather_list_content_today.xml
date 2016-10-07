@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorTodayItem"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/item_today_margin"
+    android:paddingStart="@dimen/item_today_margin"
+    android:paddingTop="@dimen/item_today_margin"
+    android:paddingBottom="@dimen/item_today_margin"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight">
+
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_city"
+            android:text="Pasir Ris"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/item_today_txtHigh_size"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/txt_date"
+            android:text="Today, "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginRight="5dp"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+
+        <TextView
+            android:id="@+id/txt_date_2"
+            android:text="October 07"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/txt_date"
+            android:layout_alignBottom="@+id/txt_date"
+            android:layout_toRightOf="@+id/txt_date"
+            android:layout_toEndOf="@+id/txt_date"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_high_temp"
+        android:text="43"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/item_today_txtHigh_size"/>
+    <TextView
+        android:id="@+id/txt_low_temp"
+        android:text="32"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/item_today_txtLow_size"
+        />
+    <TextView
+        android:id="@+id/txt_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:text="Morning thundery showers."
+        android:textColor="@android:color/white"
+        />
+
+</LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_icon"
+        android:layout_gravity="fill_vertical"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:src="@mipmap/ic_sunny"/>
+
+</LinearLayout>

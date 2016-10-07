@@ -10,8 +10,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +26,7 @@ import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.adapter.MyWeatherCursorAdapter;
 import com.example.isse.weatherapp.data.WeatherContract;
 import com.example.isse.weatherapp.service.WeatherIntentService;
+import com.example.isse.weatherapp.utility.Utility;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -54,12 +53,16 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     private boolean mTwoPane;
     private Context mContext;
     private MyWeatherCursorAdapter mCursorAdapter;
-    private Intent mServiceIntent;
+
     private boolean isConnected;
     private Cursor mCursor;
 
     private String longitude;
     private String latitude;
+
+    public static final String LATITUDE = "lat";
+    public static final String LONGITUDE = "long";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,22 +83,18 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             mTwoPane = true;
         }
 
-        //for internet connection purposes
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         checkPlayServices();
 
         setCoordinates();
 
-
         // The intent service is for executing immediate pulls from the Weather API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
-        mServiceIntent = new Intent(this, WeatherIntentService.class);
+        Intent mServiceIntent = new Intent(this, WeatherIntentService.class);
         if (savedInstanceState == null) {
-            mServiceIntent.putExtra("lat", latitude);
-            mServiceIntent.putExtra("long", longitude);
+            mServiceIntent.putExtra(LATITUDE, latitude);
+            mServiceIntent.putExtra(LONGITUDE, longitude);
+            isConnected = Utility.isConnected(mContext);
             if (isConnected) {
                 startService(mServiceIntent);
             } else {
@@ -136,6 +135,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         super.onResume();
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     }
+
 
     /**
      * Check the device to make sure it has the Google Play Services APK. If
@@ -221,7 +221,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             TextView tv = (TextView) findViewById(R.id.recyclerview_weather_empty);
             if (null != tv) {
                 int message;
-                if (!isConnected) {
+                if (!Utility.isConnected(mContext)) {
                     //network is not available
                     message = R.string.empty_list_no_network;
                 } else {

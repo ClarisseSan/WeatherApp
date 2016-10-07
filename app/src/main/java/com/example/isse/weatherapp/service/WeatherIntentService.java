@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.isse.weatherapp.ui.WeatherListActivity;
 import com.google.android.gms.gcm.TaskParams;
 
 /**
@@ -21,8 +22,8 @@ public class WeatherIntentService extends IntentService{
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String latitude = intent.getStringExtra("lat");
-        String longitude = intent.getStringExtra("long");
+        String latitude = intent.getStringExtra(WeatherListActivity.LATITUDE);
+        String longitude = intent.getStringExtra(WeatherListActivity.LONGITUDE);
 
         Bundle args = new Bundle();
         args.putString("lat", latitude);

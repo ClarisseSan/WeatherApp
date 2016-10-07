@@ -75,6 +75,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         onBindViewHolder(viewHolder, mCursor);
     }
 
+
     /**
      * Change the underlying cursor to a new cursor. If there is an existing cursor it will be
      * closed.

@@ -24,9 +24,16 @@ import com.example.isse.weatherapp.ui.WeatherDetailFragment;
  */
 
 public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherCursorAdapter.ViewHolder> {
+
     private Context mContext;
     private boolean mTwoPane;
     private FragmentManager mFragmentManager;
+
+    /*
+    * Recyclerview list position
+    * */
+    private static final int TODAY_LAYOUT = 0;
+    private static final int FUTURE_LAYOUT = 1;
 
     public MyWeatherCursorAdapter(Context context, Cursor cursor, View emptyView, boolean mTwoPane, FragmentManager fragmentManager) {
         super(context, cursor, emptyView);
@@ -54,13 +61,33 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
             txtHigh = (TextView) view.findViewById(R.id.txt_high_temp);
             txtLow = (TextView) view.findViewById(R.id.txt_low_temp);
         }
+
+
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.weather_list_content, parent, false);
-        ViewHolder vh = new ViewHolder(itemView);
+        ViewHolder vh;
+        if (parent instanceof RecyclerView) {
+            int layoutId = -1;
+            switch (viewType) {
+                case TODAY_LAYOUT: {
+                    layoutId = R.layout.weather_list_content_today;
+                    break;
+                }
+                case FUTURE_LAYOUT: {
+                    layoutId = R.layout.weather_list_content;
+                    break;
+                }
+
+            }
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(layoutId, parent, false);
+            itemView.setFocusable(false);
+            vh = new ViewHolder(itemView);
+        } else {
+            throw new RuntimeException("Not bound to RecyclerView");
+        }
         return vh;
     }
 
@@ -110,4 +137,9 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
         });
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return (position == 0) ? TODAY_LAYOUT : FUTURE_LAYOUT;
+
+    }
 }

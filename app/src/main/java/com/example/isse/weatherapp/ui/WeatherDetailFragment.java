@@ -46,6 +46,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     * */
     private ImageView imgIcon;
     private TextView txtDay;
+    private TextView txtDate;
     private TextView txtDescription;
     private TextView txtHigh;
     private TextView txtLow;
@@ -104,6 +105,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
         imgIcon = (ImageView) rootView.findViewById(R.id.img_weather_icon);
 
         txtDay = (TextView) rootView.findViewById(R.id.txt_weather_day);
+        txtDate = (TextView) rootView.findViewById(R.id.txt_weather_date);
         txtDescription = (TextView) rootView.findViewById(R.id.txt_weather_description);
         txtHigh = (TextView) rootView.findViewById(R.id.txt_weather_high);
         txtLow = (TextView) rootView.findViewById(R.id.txt_weather_low);
@@ -143,6 +145,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
 
             //get values from database
             String day = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DAY));
+            String mydate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
             String description = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESCRIPTION));
             String high = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH));
             String low = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW));
@@ -157,6 +160,8 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
 
             //set values to views
             txtDay.setText("Day: " + day);
+            txtDate.setText("Date: " + mydate);
+
 
             txtDescription.setText("Description: " + description);
             txtHigh.setText("High: " + high);
