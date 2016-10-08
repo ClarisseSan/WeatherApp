@@ -9,11 +9,14 @@ import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -40,7 +43,7 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class WeatherListActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class WeatherListActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, LocationListener {
 
 
     private static final int CURSOR_LOADER_ID = 0;
@@ -62,6 +65,18 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "long";
+
+
+    private int REQUEST_LOCATION = 1;
+    boolean hasLocationPermission = false;
+    LocationManager locationManager;
+
+    private final static int DISTANCE_UPDATES = 1;
+    private final static int TIME_UPDATES = 1000;
+
+    RecyclerView recyclerView;
+    private View emptyView;
+    private FragmentManager fragmentManager;
 
 
     @Override
@@ -86,34 +101,38 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         checkPlayServices();
 
-        setCoordinates();
+        //setLocation();
 
+        //request permission for GPS
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
 
-
-
-
-        // The intent service is for executing immediate pulls from the Weather API
-        // GCMTaskService can only schedule tasks, they cannot execute immediately
-        Intent mServiceIntent = new Intent(this, WeatherIntentService.class);
-        if (savedInstanceState == null) {
-            mServiceIntent.putExtra(LATITUDE, latitude);
-            mServiceIntent.putExtra(LONGITUDE, longitude);
-            isConnected = Utility.isConnected(mContext);
-            if (isConnected) {
-                startService(mServiceIntent);
-            } else {
-                networkToast();
-            }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (checkPermission()) {
+            showEnabledLocationUI();
+            String networkProvider = getLocationProvider();
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+            Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location location = gpsLocation != null ? gpsLocation : networkLocation;
+            Log.v("create", "location(" + location + ")");
+            onLocationChanged(location);
+        } else {
+            requestPermission();
         }
 
+        if(latitude!=null&&longitude!=null){
+            //get weather details
+            fetchWeatherDetails();
+        }
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.weather_list);
+        recyclerView = (RecyclerView) findViewById(R.id.weather_list);
 
         //set empty view
-        View emptyView = findViewById(R.id.recyclerview_weather_empty);
+         emptyView = findViewById(R.id.recyclerview_weather_empty);
 
         //get the fragment manager
-        FragmentManager fragmentManager = getSupportFragmentManager();
+         fragmentManager = getSupportFragmentManager();
 
         mCursorAdapter = new MyWeatherCursorAdapter(this, null, emptyView, mTwoPane, fragmentManager);
 
@@ -122,6 +141,29 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         }
 
     }
+
+    private void fetchWeatherDetails() {
+
+        // The intent service is for executing immediate pulls from the Weather API
+        // GCMTaskService can only schedule tasks, they cannot execute immediately
+
+            Intent weatherIntentService = new Intent(this, WeatherIntentService.class);
+            Log.e(LOG_TAG, "Lat ----->" + latitude);
+            Log.e(LOG_TAG, "Long ----->" + longitude);
+
+            weatherIntentService.putExtra(LATITUDE, latitude);
+            weatherIntentService.putExtra(LONGITUDE, longitude);
+
+            isConnected = Utility.isConnected(mContext);
+
+            if (isConnected) {
+                startService(weatherIntentService);
+            } else {
+                networkToast();
+            }
+        }
+
+
 
     @Override
     protected void onStart() {
@@ -165,6 +207,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(mCursorAdapter);
+        mCursorAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -186,7 +229,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     }
 
-    public void setCoordinates() {
+    public void setLocation() {
 
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         List<String> p = locationManager.getProviders(true);
@@ -216,6 +259,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     }
 
+
     /*
         Updates the empty list view with contextually relevant information that the user can
         use to determine why they aren't seeing weather.
@@ -240,6 +284,103 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.v("onLocationChanged", "location changed (" + location + ")");
+        if (location != null) {
+            latitude = String.valueOf(location.getLatitude());
+            longitude = String.valueOf(location.getLongitude());
+
+            fetchWeatherDetails();
+            if (recyclerView != null) {
+                setupRecyclerView(recyclerView);
+            }
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+        if (checkPermission()) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+        } else {
+            requestPermission();
+        }
+        showEnabledLocationUI();
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+        if (checkPermission()) {
+            locationManager.removeUpdates(this);
+        } else {
+            requestPermission();
+        }
+        showDisabledLocationUI();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.length > 0) {
+                if (checkPermission()) {
+                    showEnabledLocationUI();
+                    String locationProvider = getLocationProvider();
+                    locationManager.requestLocationUpdates(locationProvider, TIME_UPDATES, DISTANCE_UPDATES, this);
+                } else {
+                    showDisabledLocationUI();
+                    requestPermission();
+                }
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT < 23) {
+            return true;
+        }
+        hasLocationPermission = false;
+        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            hasLocationPermission = true;
+        }
+        return hasLocationPermission;
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            showDisabledLocationUI();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+    }
+
+    private void showDisabledLocationUI() {
+        Toast.makeText(mContext, getString(R.string.no_gps), Toast.LENGTH_SHORT).show();
+    }
+
+    private void showEnabledLocationUI() {
+        Toast.makeText(mContext, getString(R.string.wait_gps), Toast.LENGTH_SHORT).show();
+    }
+
+    private String getLocationProvider() {
+        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        Log.v("getLocationProvider", "gpsEnabled(" + gpsEnabled + ") networkEnabled(" + networkEnabled + ")");
+        String locationProvider = gpsEnabled ? LocationManager.GPS_PROVIDER : LocationManager.NETWORK_PROVIDER;
+        return locationProvider;
     }
 
 

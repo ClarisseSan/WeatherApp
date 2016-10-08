@@ -13,6 +13,8 @@ import android.preference.PreferenceManager;
 public class Utility {
     public static String WEATHER_API_KEY = "ee3eae518914dcd05823d45966b449c3";
     private static final String CITY = "city";
+    private static final String LONGITUDE = "longitude";
+    private static final String LATITUDE = "latitude";
 
 
     public static void saveCity(Context context, String city) {
@@ -22,9 +24,8 @@ public class Utility {
 
     public static String getCity(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(CITY," ");
+        return prefs.getString(CITY, " ");
     }
-
 
     /**
      * Returns true if network suddenly becomes available
