@@ -1,5 +1,8 @@
 package com.example.isse.weatherapp;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;

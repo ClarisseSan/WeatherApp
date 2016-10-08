@@ -18,6 +18,7 @@ import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.data.WeatherContract.WeatherEntry;
 import com.example.isse.weatherapp.ui.WeatherDetailActivity;
 import com.example.isse.weatherapp.ui.WeatherDetailFragment;
+import com.example.isse.weatherapp.utility.Utility;
 
 /**
  * Created by isse on 05/10/2016.
@@ -50,6 +51,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
         public TextView txtForecast;
         public TextView txtHigh;
         public TextView txtLow;
+        public TextView txtCity;
 
         public ViewHolder(View view) {
             super(view);
@@ -60,6 +62,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
             txtForecast = (TextView) view.findViewById(R.id.txt_forecast);
             txtHigh = (TextView) view.findViewById(R.id.txt_high_temp);
             txtLow = (TextView) view.findViewById(R.id.txt_low_temp);
+            txtCity = (TextView) view.findViewById(R.id.txt_city);
         }
 
 
@@ -101,6 +104,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
         viewHolder.txtForecast.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESCRIPTION)));
         viewHolder.txtHigh.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_HIGH)) + DEGREE);
         viewHolder.txtLow.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_LOW)) + DEGREE);
+        viewHolder.txtCity.setText(Utility.getCity(mContext));
 
         //set icon image
         final String prefix = "ic_";

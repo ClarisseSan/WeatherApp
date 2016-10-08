@@ -175,7 +175,11 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
 
             String city = forecastJson.getJSONObject("city").getString("name");
             Log.e(LOG_TAG, "CITY --->" + city);
+            //save city in shared pref
+            Utility.saveCity(mContext,city);
+
             JSONArray list = forecastJson.getJSONArray("list");
+
 
             //Using the Gregorian Calendar Class to get current date
             Calendar gc = new GregorianCalendar();
@@ -208,7 +212,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 max = String.valueOf(temp.getDouble("max"));
                 Log.e(LOG_TAG, "MAX --->" + max.toString());
 
-                //----------------------------------------
                 temp_day = String.valueOf(temp.getDouble("day"));
                 Log.e(LOG_TAG, "TEMP_DAY --->" + temp_day.toString());
 
@@ -220,8 +223,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
 
                 temp_mor = String.valueOf(temp.getDouble("morn"));
                 Log.e(LOG_TAG, "TEMP_MORN --->" + temp_mor.toString());
-
-                //---------------------------------------
 
                 humidity = dayForecast.getInt("humidity");
                 Log.e(LOG_TAG, "HUMIDITY --->" + String.valueOf(humidity));

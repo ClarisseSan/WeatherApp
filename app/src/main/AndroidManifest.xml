@@ -27,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.WeatherListActivity"
+            android:name="com.example.isse.weatherapp.ui.WeatherListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -37,9 +37,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.WeatherDetailActivity"
+            android:name="com.example.isse.weatherapp.ui.WeatherDetailActivity"
             android:label="@string/title_weather_detail"
-            android:parentActivityName=".ui.WeatherListActivity"
+            android:parentActivityName="com.example.isse.weatherapp.ui.WeatherListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -48,17 +48,17 @@
 
 
         <service
-            android:name=".service.WeatherTaskService"
+            android:name="com.example.isse.weatherapp.service.WeatherTaskService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
         </service>
-        <service android:name=".service.WeatherIntentService" />
+        <service android:name="com.example.isse.weatherapp.service.WeatherIntentService" />
         <provider
             android:authorities="com.example.isse.weatherapp"
-            android:name=".data.WeatherProvider"
+            android:name="com.example.isse.weatherapp.data.WeatherProvider"
             android:exported="false"
             android:syncable="true"/>
 
