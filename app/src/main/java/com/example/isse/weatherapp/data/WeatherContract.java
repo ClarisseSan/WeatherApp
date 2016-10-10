@@ -14,7 +14,8 @@ public class WeatherContract {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    public WeatherContract(){}
+    public WeatherContract() {
+    }
 
 
     //Content provider variables
@@ -23,7 +24,7 @@ public class WeatherContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
 
-    public static abstract class WeatherEntry implements BaseColumns{
+    public static abstract class WeatherEntry implements BaseColumns {
         //DETAIL TABLE
         public static final String TABLE_WEATHER = "weather_tbl";
         public static final String COLUMN_DAY = "day";
@@ -41,7 +42,6 @@ public class WeatherContract {
         public static final String COLUMN_WIND = "wind";
 
 
-
         // create content uri
         //content://com.example.isse.weatherapp/weather_tbl
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(TABLE_WEATHER).build();
@@ -54,8 +54,6 @@ public class WeatherContract {
         public static Uri buildDetailsUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-
 
 
     }

@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class WeatherDbHelper extends SQLiteOpenHelper{
+public class WeatherDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "weather.db";
     private static final int DATABASE_VERSION = 4;
@@ -37,7 +37,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper{
     /* query for deleting review_tbl*/
     private static final String SQL_DELETE_DETAIL =
             "DROP TABLE IF EXISTS " + WeatherContract.WeatherEntry.TABLE_WEATHER;
-
 
 
     public WeatherDbHelper(Context context) {
