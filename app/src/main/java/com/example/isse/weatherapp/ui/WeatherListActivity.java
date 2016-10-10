@@ -1,19 +1,25 @@
 package com.example.isse.weatherapp.ui;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +36,7 @@ import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.adapter.MyWeatherCursorAdapter;
 import com.example.isse.weatherapp.application.MyApplication;
 import com.example.isse.weatherapp.data.WeatherContract;
+import com.example.isse.weatherapp.service.WeatherIntentService;
 import com.example.isse.weatherapp.utility.Utility;
 
 /**
@@ -40,11 +47,10 @@ import com.example.isse.weatherapp.utility.Utility;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class WeatherListActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class WeatherListActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, LocationListener {
 
 
     private static final int CURSOR_LOADER_ID = 0;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private final String LOG_TAG = WeatherListActivity.class.getSimpleName();
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -54,19 +60,15 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     private Context mContext;
     private MyWeatherCursorAdapter mCursorAdapter;
 
-    private boolean isConnected;
     private Cursor mCursor;
-
-    private String longitude;
-    private String latitude;
-
-    public static final String LATITUDE = "lat";
-    public static final String LONGITUDE = "long";
-
 
     private int REQUEST_LOCATION = 1;
     boolean hasLocationPermission = false;
     LocationManager locationManager;
+
+    private final static int DISTANCE_UPDATES = 1;//1 meter
+    private final static int TIME_UPDATES = 1000 * 60 * 300;//30mins
+
 
 
     RecyclerView recyclerView;
@@ -93,9 +95,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             mTwoPane = true;
         }
 
-
-        // checkPlayServices();
-
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //get the fragment manager
@@ -109,7 +108,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         }
 
         MyApplication application = (MyApplication) getApplication();
-        if (!application.checkPermission()) {
+        if (checkPermission()) {
             requestPermission();
         }
 
@@ -131,6 +130,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     @Override
     protected void onResume() {
         super.onResume();
+        startLocationDetection();
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         getContentResolver().registerContentObserver(WeatherContract.WeatherEntry.CONTENT_URI, true, myObserver);
     }
@@ -140,6 +140,50 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         super.onPause();
         getContentResolver().unregisterContentObserver(myObserver);
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Intent weatherIntentService = new Intent(this, WeatherIntentService.class);
+        weatherIntentService.putExtra(WeatherIntentService.LATITUDE, location.getLatitude()+"");
+        weatherIntentService.putExtra(WeatherIntentService.LONGITUDE, location.getLongitude()+"");
+
+        boolean isConnected = Utility.isConnected(this);
+        if (isConnected) {
+            startService(weatherIntentService);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+        startLocationDetection();
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        if (checkPermission()) {
+            locationManager.removeUpdates(this);
+        }
+        showSettingsAlert();
+    }
+
+    public void startLocationDetection() {
+        this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (checkPermission()) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, TIME_UPDATES, DISTANCE_UPDATES, this);
+            Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location location = gpsLocation != null ? gpsLocation : networkLocation;
+            Log.v("create", "location(" + location + ")");
+        }
+    }
+
 
     class MyLocationObserver extends ContentObserver {
         public MyLocationObserver(Handler handler) {
@@ -215,8 +259,9 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         if (requestCode == REQUEST_LOCATION) {
             if (grantResults.length > 0) {
                 if (checkPermission()) {
-                    MyApplication application = (MyApplication) getApplication();
-                    application.startLocationDetection();
+//                    MyApplication application = (MyApplication) getApplication();
+//                    application.startLocationDetection();
+                    startLocationDetection();
                 } else {
                     showDisabledLocationUI();
                     requestPermission();
@@ -250,6 +295,39 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     private void showDisabledLocationUI() {
         Toast.makeText(mContext, getString(R.string.no_gps), Toast.LENGTH_SHORT).show();
     }
+
+
+    /**
+     * Function to show settings alert dialog
+     * */
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("GPS settings");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                mContext.startActivity(intent);
+            }
+        });
+
+        // on pressing cancel button
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Showing Alert Message
+        alertDialog.show();
+    }
+
 
 
 }
