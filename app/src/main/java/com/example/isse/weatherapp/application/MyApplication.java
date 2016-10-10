@@ -81,6 +81,8 @@ public class MyApplication extends Application implements LocationListener {
         }
     }
 
+
+
     @Override
     public void onProviderDisabled(String s) {
         if (checkPermission()) {
