@@ -2,6 +2,7 @@ package com.example.isse.weatherapp.task;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -31,8 +32,7 @@ import java.util.Locale;
 /**
  * Created by isse on 04/10/2016.
  */
-
-public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
+public class DownloadWeatherTask extends AsyncTask<Object, Object, String> {
 
     private static final String LOG_TAG = DownloadWeatherTask.class.getSimpleName();
     private Context mContext;
@@ -46,7 +46,7 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected String doInBackground(Object... params) {
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -71,10 +71,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
             final String UNITS = "units";
 
             //values for parameters
-
-//            final String LAT = "1.29";
-//            final String LON = "103.85";
-
             final String LAT = mLatitude;
             final String LON = mLongitude;
 
@@ -125,7 +121,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             forecastJsonStr = buffer.toString();
-            getForecastFromJSON(forecastJsonStr);
             Log.e(LOG_TAG, "RESPONSE--->" + forecastJsonStr);
 
 
@@ -134,8 +129,6 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {
@@ -149,9 +142,25 @@ public class DownloadWeatherTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
+        return forecastJsonStr;
+    }
 
-
-        return null;
+    @Override
+    protected void onPostExecute(String forecastJsonStr)
+    {
+        Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
+        if (cursor != null) {
+            mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
+            Log.v("onPostExecute", "Deleted.. couting again ");
+            cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
+            Log.v("onPostExecute", cursor.getCount()+"");
+            cursor.close();
+        }
+        try {
+            getForecastFromJSON(forecastJsonStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getForecastFromJSON(String jsonString) throws JSONException {
