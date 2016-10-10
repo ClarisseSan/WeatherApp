@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.data.WeatherContract.WeatherEntry;
+import com.example.isse.weatherapp.utility.Utility;
 
 /**
  * A fragment representing a single Weather detail screen.
@@ -45,6 +46,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     * Views
     * */
     private ImageView imgIcon;
+    private TextView txtCity;
     private TextView txtDay;
     private TextView txtDate;
     private TextView txtDescription;
@@ -57,6 +59,8 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     private TextView txtHumidity;
     private TextView txtRain;
     private TextView txtWind;
+    private CollapsingToolbarLayout appBarLayout;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -78,11 +82,11 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
             Log.e(LOG_TAG, "URI------>" + mUri.toString());
 
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mId);
-            }
+            appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+
         }
+
+
     }
 
     @Override
@@ -103,7 +107,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
         View rootView = inflater.inflate(R.layout.weather_detail, container, false);
 
         imgIcon = (ImageView) rootView.findViewById(R.id.img_weather_icon);
-
+        txtCity = (TextView) rootView.findViewById(R.id.txt_city);
         txtDay = (TextView) rootView.findViewById(R.id.txt_weather_day);
         txtDate = (TextView) rootView.findViewById(R.id.txt_weather_date);
         txtDescription = (TextView) rootView.findViewById(R.id.txt_weather_description);
@@ -139,6 +143,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        final String DEGREE = "\u00b0";
 
         if (loader.getId() == CURSOR_LOADER_ID && cursor != null && cursor.moveToFirst()) {
             int weather_id = cursor.getInt(cursor.getColumnIndex(WeatherEntry._ID));
@@ -158,23 +163,32 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
             String rain = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
             String wind = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_WIND));
 
+            //get City from shared pref
+            String city = Utility.getCity(mContext);
+
+            //action bar title
+            if (appBarLayout != null) {
+                appBarLayout.setTitle(city);
+            }
+
             //set values to views
-            txtDay.setText("Day: " + day);
-            txtDate.setText("Date: " + mydate);
+            txtCity.setText(city);
+            txtDay.setText(day + ", ");
+            txtDate.setText(mydate);
 
 
-            txtDescription.setText("Description: " + description);
-            txtHigh.setText("High: " + high);
-            txtLow.setText("Low: " + low);
+            txtDescription.setText(description);
+            txtHigh.setText(high);
+            txtLow.setText(low);
 
-            txtTempNight.setText("NIGHT TEMP: " + temp_night);
-            txtTempMorn.setText("MORNING TEMP: " + temp_morn);
-            txtTempDay.setText("DAY TEMP: " + temp_day);
-            txtTempEve.setText("EVENING TEMP: " + temp_eve);
+            txtTempNight.setText(temp_night + DEGREE);
+            txtTempMorn.setText(temp_morn + DEGREE);
+            txtTempDay.setText(temp_day + DEGREE);
+            txtTempEve.setText(temp_eve + DEGREE);
 
-            txtHumidity.setText("Humidity: " + humidity);
-            txtRain.setText("Rain: " + rain);
-            txtWind.setText("Wind: " + wind);
+            txtHumidity.setText(humidity + "%");
+            txtRain.setText(rain);
+            txtWind.setText(wind + "m/s");
 
 
             //set icon image
@@ -190,4 +204,6 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+
 }

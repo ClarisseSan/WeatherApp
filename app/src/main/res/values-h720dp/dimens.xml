@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <dimen name="detail_txtCity_size">40sp</dimen>
+    <dimen name="detail_txtHigh_size">25sp</dimen>
+    <dimen name="detail_txtDescription_size">35sp</dimen>
+    <dimen name="detail_txtDate_size">35sp</dimen>
+    <dimen name="txtPressure_size">30sp</dimen>
+    <dimen name="txtTemperature_size">55sp</dimen>
+    <dimen name="temperature_style_background_padding">15dp</dimen>
+    <dimen name="detail_padding">32dp</dimen>
+    <dimen name="item_today_margin">64dp</dimen>
+    <dimen name="detail_header_padding">32dp</dimen>
+    <dimen name="item_today_txtHigh_size">55sp</dimen>
+    <dimen name="item_today_txtLow_size">45sp</dimen>
+
+</resources>

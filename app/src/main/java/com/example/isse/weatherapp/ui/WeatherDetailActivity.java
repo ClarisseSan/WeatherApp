@@ -1,6 +1,7 @@
 package com.example.isse.weatherapp.ui;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,16 +11,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.example.isse.weatherapp.R;
+
+import java.util.Calendar;
+import java.util.Date;
+
+
 
 /**
  * An activity representing a single Weather detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
  * in a {@link WeatherListActivity}.
+ *
+ *
  */
 public class WeatherDetailActivity extends AppCompatActivity {
+
+
+
+    /*
+    * TIME oF DAY
+    * */
+    private  final String MORNING = "morning";
+    private final String DAY = "day";
+    private final String EVENING = "evening";
+    private final String NIGHT = "night";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,19 +47,28 @@ public class WeatherDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        //setImage
+        ImageView imgTime = (ImageView) findViewById(R.id.img_time);
+        switch (getTimeOfDay()){
+            case MORNING:
+                imgTime.setImageResource(R.drawable.bg_morning);
+                break;
+            case DAY:
+                imgTime.setImageResource(R.drawable.bg_day);
+                break;
+            case EVENING:
+                imgTime.setImageResource(R.drawable.bg_eve);
+                break;
+            case NIGHT:
+                imgTime.setImageResource(R.drawable.bg_night);
+                break;
+            default:imgTime.setImageResource(R.drawable.bg_day);
         }
 
         // savedInstanceState is non-null when there is fragment state
@@ -82,5 +110,24 @@ public class WeatherDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private String  getTimeOfDay() {
+        Date dt = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        int hours = c.get(Calendar.HOUR_OF_DAY);
+
+        if(hours>=4 && hours<=8){
+            return MORNING;
+        }else if(hours>=8 && hours<=17){
+            return DAY;
+        }else if(hours>=17 && hours<=21){
+            return EVENING;
+        }else if(hours>=21){
+            return NIGHT;
+        }
+        return null;
     }
 }

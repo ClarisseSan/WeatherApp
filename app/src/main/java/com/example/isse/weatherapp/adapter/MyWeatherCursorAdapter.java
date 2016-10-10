@@ -57,8 +57,8 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
             super(view);
             mView = view;
             imgIcon = (ImageView) view.findViewById(R.id.img_icon);
-            txtDay = (TextView) view.findViewById(R.id.txt_date);
-            txtDate = (TextView) view.findViewById(R.id.txt_date_2);
+            txtDay = (TextView) view.findViewById(R.id.txt_weather_day);
+            txtDate = (TextView) view.findViewById(R.id.txt_weather_date);
             txtForecast = (TextView) view.findViewById(R.id.txt_forecast);
             txtHigh = (TextView) view.findViewById(R.id.txt_high_temp);
             txtLow = (TextView) view.findViewById(R.id.txt_low_temp);

@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorTodayItem"
+    android:background="@drawable/bg_main"
     android:orientation="horizontal"
     android:paddingLeft="@dimen/item_today_margin"
     android:paddingStart="@dimen/item_today_margin"
     android:paddingTop="@dimen/item_today_margin"
     android:paddingBottom="@dimen/item_today_margin"
-    android:gravity="center_vertical"
     android:minHeight="?android:attr/listPreferredItemHeight">
 
 
@@ -17,7 +16,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:layout_weight="3"
         android:orientation="vertical">
 
         <TextView
@@ -26,14 +25,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/item_today_txtHigh_size"/>
+            android:textSize="@dimen/item_today_txtHigh_size"
+            />
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
 
         <TextView
-            android:id="@+id/txt_date"
+            android:id="@+id/txt_weather_day"
             android:text="Today, "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,18 +42,18 @@
             android:layout_alignParentStart="true"
             android:layout_marginRight="5dp"
             android:textColor="@android:color/white"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
 
         <TextView
-            android:id="@+id/txt_date_2"
+            android:id="@+id/txt_weather_date"
             android:text="October 07"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/txt_date"
-            android:layout_alignBottom="@+id/txt_date"
-            android:layout_toRightOf="@+id/txt_date"
-            android:layout_toEndOf="@+id/txt_date"
+            android:layout_alignBaseline="@+id/txt_weather_day"
+            android:layout_alignBottom="@+id/txt_weather_day"
+            android:layout_toRightOf="@+id/txt_weather_day"
+            android:layout_toEndOf="@+id/txt_weather_day"
             android:textColor="@android:color/white"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/item_today_txtHigh_size"/>
+        android:textSize="@dimen/item_today_txtLow_size"/>
     <TextView
         android:id="@+id/txt_low_temp"
         android:text="32"
@@ -78,19 +78,24 @@
         android:id="@+id/txt_forecast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textAppearance="?android:textAppearanceLarge"
         android:text="Morning thundery showers."
         android:textColor="@android:color/white"
         />
 
-</LinearLayout>
 
-    <ImageView
-        android:id="@+id/img_icon"
-        android:layout_gravity="fill_vertical"
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:src="@mipmap/ic_sunny"/>
-
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/img_icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_02d"/>
+    </LinearLayout>
 </LinearLayout>

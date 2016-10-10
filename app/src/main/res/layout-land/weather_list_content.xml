@@ -6,10 +6,10 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:orientation="horizontal"
 
-    android:paddingLeft="@dimen/item_today_margin"
-    android:paddingStart="@dimen/item_today_margin"
-    android:paddingEnd="@dimen/item_today_margin"
-    android:paddingRight="@dimen/item_today_margin">
+    android:paddingLeft="@dimen/item_today_margin_land"
+    android:paddingStart="@dimen/item_today_margin_land"
+    android:paddingEnd="@dimen/item_today_margin_land"
+    android:paddingRight="@dimen/item_today_margin_land">
 
 <LinearLayout
     android:layout_width="0dp"
