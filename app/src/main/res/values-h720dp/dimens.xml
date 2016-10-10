@@ -14,5 +14,6 @@
     <dimen name="detail_header_padding">32dp</dimen>
     <dimen name="item_today_txtHigh_size">55sp</dimen>
     <dimen name="item_today_txtLow_size">45sp</dimen>
+    <dimen name="item_today_city">45sp</dimen>
 
 </resources>

@@ -20,4 +20,5 @@
     <dimen name="txtTemperature_size">30sp</dimen>
     <dimen name="temperature_style_background_padding">5dp</dimen>
     <dimen name="detail_padding">16dp</dimen>
+    <dimen name="item_today_city">35sp</dimen>
 </resources>
