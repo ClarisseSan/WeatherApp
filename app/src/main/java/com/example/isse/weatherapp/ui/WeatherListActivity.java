@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.example.isse.weatherapp.R;
 import com.example.isse.weatherapp.adapter.MyWeatherCursorAdapter;
-import com.example.isse.weatherapp.application.MyApplication;
 import com.example.isse.weatherapp.data.WeatherContract;
 import com.example.isse.weatherapp.service.WeatherIntentService;
 import com.example.isse.weatherapp.utility.Utility;
@@ -67,8 +66,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     LocationManager locationManager;
 
     private final static int DISTANCE_UPDATES = 1;//1 meter
-    private final static int TIME_UPDATES = 1000 * 60 * 300;//30mins
-
+    private final static int TIME_UPDATES = 1000 * 60 * 3000;//30mins
 
 
     RecyclerView recyclerView;
@@ -97,6 +95,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+
         //get the fragment manager
         fragmentManager = getSupportFragmentManager();
 
@@ -107,7 +106,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             setupRecyclerView(recyclerView);
         }
 
-        MyApplication application = (MyApplication) getApplication();
         if (checkPermission()) {
             requestPermission();
         }
@@ -125,6 +123,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         super.onStart();
         //initialize cursor loader
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
     }
 
     @Override
@@ -144,8 +143,8 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     @Override
     public void onLocationChanged(Location location) {
         Intent weatherIntentService = new Intent(this, WeatherIntentService.class);
-        weatherIntentService.putExtra(WeatherIntentService.LATITUDE, location.getLatitude()+"");
-        weatherIntentService.putExtra(WeatherIntentService.LONGITUDE, location.getLongitude()+"");
+        weatherIntentService.putExtra(WeatherIntentService.LATITUDE, location.getLatitude() + "");
+        weatherIntentService.putExtra(WeatherIntentService.LONGITUDE, location.getLongitude() + "");
 
         boolean isConnected = Utility.isConnected(this);
         if (isConnected) {
@@ -259,8 +258,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         if (requestCode == REQUEST_LOCATION) {
             if (grantResults.length > 0) {
                 if (checkPermission()) {
-//                    MyApplication application = (MyApplication) getApplication();
-//                    application.startLocationDetection();
                     startLocationDetection();
                 } else {
                     showDisabledLocationUI();
@@ -299,7 +296,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     /**
      * Function to show settings alert dialog
-     * */
+     */
     public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
@@ -327,7 +324,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         // Showing Alert Message
         alertDialog.show();
     }
-
 
 
 }
