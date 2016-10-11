@@ -95,6 +95,8 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+        //initialize cursor loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         //get the fragment manager
         fragmentManager = getSupportFragmentManager();
@@ -121,9 +123,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     @Override
     protected void onStart() {
         super.onStart();
-        //initialize cursor loader
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-
     }
 
     @Override
