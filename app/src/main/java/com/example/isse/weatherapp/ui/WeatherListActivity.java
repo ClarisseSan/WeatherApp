@@ -66,7 +66,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     LocationManager locationManager;
 
     private final static int DISTANCE_UPDATES = 1;//1 meter
-    private final static int TIME_UPDATES = 1000 * 60 * 3000;//30mins
+    private final static int TIME_UPDATES = 1000 * 60 * 30;//30mins
 
 
     RecyclerView recyclerView;
@@ -301,13 +301,13 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
         // Setting Dialog Title
-        alertDialog.setTitle("GPS settings");
+        alertDialog.setTitle(R.string.GPS_Setting);
 
         // Setting Dialog Message
-        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+        alertDialog.setMessage(R.string.GPS_Setting_message);
 
         // On pressing Settings button
-        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 mContext.startActivity(intent);

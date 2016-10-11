@@ -8,4 +8,7 @@
     <string name="empty_list_no_network">No weather information available. The network is not available to fetch weather.</string>
     <string name="no_gps">This app relies on location data for it\'s main functionality. Please enable GPS data to access all features.</string>
     <string name="wait_gps">Please wait for location.</string>
+    <string name="GPS_Setting">GPS settings</string>
+    <string name="GPS_Setting_message">GPS is not enabled. Do you want to go to settings menu?</string>
+    <string name="settings">Settings</string>
 </resources>
