@@ -112,7 +112,10 @@ public class WeatherDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
+* returns part of day base on time (morning, day, eve, night)
+* This will be used for setting background image on toolbar
+* */
     private String  getTimeOfDay() {
         Date dt = new Date();
         Calendar c = Calendar.getInstance();

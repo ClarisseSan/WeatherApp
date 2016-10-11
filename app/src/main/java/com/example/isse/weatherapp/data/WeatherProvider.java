@@ -19,8 +19,6 @@ public class WeatherProvider extends ContentProvider {
     private static final String LOG_TAG = WeatherProvider.class.getSimpleName();
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
-    public static String haha = null;
-
     private WeatherDbHelper mWeatherDbHelper;
 
     /*code for URI matcher*/
@@ -71,7 +69,7 @@ public class WeatherProvider extends ContentProvider {
                 return retCursor;
             }
 
-            // Individual flavor based on Id selected
+            // Individual weather based on Id selected
             case WEATHER_WITH_ID: {
                 retCursor = mWeatherDbHelper.getReadableDatabase().query(
                         WeatherContract.WeatherEntry.TABLE_WEATHER,

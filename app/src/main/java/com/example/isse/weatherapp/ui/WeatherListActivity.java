@@ -269,6 +269,7 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     }
 
     private boolean checkPermission() {
+        // APIs 23 and above are strict regarding permissions
         if (Build.VERSION.SDK_INT < 23) {
             return true;
         }
