@@ -171,6 +171,7 @@ public class WeatherIntentService extends IntentService {
 
         Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
         if (cursor != null) {
+            //delete all contents of database to update data
             mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
             Log.v("onPostExecute", "Deleted.. couting again ");
             cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
@@ -178,6 +179,7 @@ public class WeatherIntentService extends IntentService {
             cursor.close();
         }
         try {
+            //insert values to database
             getForecastFromJSON(forecastJsonStr);
         } catch (JSONException e) {
             e.printStackTrace();

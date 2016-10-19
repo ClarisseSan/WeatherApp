@@ -108,6 +108,7 @@ public class WeatherDetailFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onStart() {
         super.onStart();
+        //activate loader
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 

@@ -159,6 +159,7 @@ public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherC
 
     @Override
     public int getItemViewType(int position) {
+        //we need to show different types of view in recycler view
         return (position == 0) ? TODAY_LAYOUT : FUTURE_LAYOUT;
 
     }

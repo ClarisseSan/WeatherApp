@@ -34,7 +34,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -95,6 +94,8 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_list);
 
+
+        //setup the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -111,10 +112,12 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        //initialize cursor loader
+        //Calling initLoader when the Loader has already been created
+        // (this typically happens after configuration changes, for example)
+        // tells the LoaderManager to deliver the Loader's most recent data to onLoadFinished immediately.
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-        //get the fragment manager
+        //get the fragment manager and pass it later to the recyclerview adapter
         fragmentManager = getSupportFragmentManager();
 
         View emptyView = findViewById(R.id.recyclerview_weather_empty);
@@ -128,17 +131,8 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
             requestPermission();
         }
 
+        //content observer
         myObserver = new MyLocationObserver(new Handler());
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -146,12 +140,17 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         super.onResume();
         startLocationDetection();
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+
+        //Register your content observer to listen for changes
         getContentResolver().registerContentObserver(WeatherContract.WeatherEntry.CONTENT_URI, true, myObserver);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        //When you have registered a content observer, it is your responsibility to also unregister it.
+        // Otherwise you would create a memory leak and your Activity would never be garbage collected.
         getContentResolver().unregisterContentObserver(myObserver);
     }
 
@@ -175,7 +174,6 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     @Override
     public void onProviderEnabled(String s) {
         startLocationDetection();
-
     }
 
     @Override
@@ -199,14 +197,27 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
     }
 
 
+    /*
+    * Since I am using a content provider as a client
+    * and I want to know whenever the data changes,
+    * Im going to use ContentObserver.
+    * */
     class MyLocationObserver extends ContentObserver {
         public MyLocationObserver(Handler handler) {
             super(handler);
         }
 
+
+        /*
+        * these are called whenever a there's a change
+        * */
         @Override
         public void onChange(boolean selfChange, Uri uri) {
+
+            //Calling restartLoader destroys an already existing Loader (as well as any existing data associated with it)
+            // and tells the LoaderManager to call onCreateLoader to create the new Loader and to initiate a new load.
             getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, WeatherListActivity.this);
+
             Log.v("MyLocationObserver", "Observed a change in cursor URI..");
         }
     }
@@ -228,7 +239,12 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        //remove all the underlying references with the cursor.
+        // otherwise it will create a memory leak and your activity will not get garbage collected.
         mCursorAdapter.swapCursor(data);
+
+        //refresh
         mCursorAdapter.notifyDataSetChanged();
         mCursor = data;
 
@@ -265,12 +281,21 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        //remove all the underlying references with the cursor.
+        // otherwise it will create a memory leak and your activity will not get garbage collected.
         mCursorAdapter.swapCursor(null);
     }
 
+
+    /*
+    * When your app requests permissions, the system presents a dialog box to the user.
+    * When the user responds, the system invokes your app's onRequestPermissionsResult() method,
+     * passing it the user response. Your app has to override that method to find out whether the permission was granted.
+    * */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_LOCATION) {
+            // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0) {
                 if (checkPermission()) {
                     startLocationDetection();
@@ -284,23 +309,52 @@ public class WeatherListActivity extends AppCompatActivity implements LoaderCall
         }
     }
 
+
+    /*
+    * if the app's target SDK is 22 or lower:
+    * If you list a dangerous permission in your manifest, the user has to grant the permission
+    * when they install the app; if they do not grant the permission, the system does not install the app at all.
+    *
+    *
+    * If the app's target SDK is 23 or higher:
+    * The app has to list the permissions in the manifest, and it must request each dangerous permission
+    * it needs while the app is running. The user can grant or deny each permission,
+    * and the app can continue to run with limited capabilities even if the user denies a permission request.
+    *
+    * for more info:
+    * https://developer.android.com/training/permissions/requesting.html
+    * */
     private boolean checkPermission() {
-        // APIs 23 and above are strict regarding permissions
+
         if (Build.VERSION.SDK_INT < 23) {
             return true;
         }
         hasLocationPermission = false;
+
+        //This method returns immediately and you’re highly encouraged to use it in order to disable
+        // some UI-controls that rely on that permission, or simply avoid SecurityExceptions in your app.
         int result = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
         if (result == PackageManager.PERMISSION_GRANTED) {
+            // permission was granted, yay!
             hasLocationPermission = true;
         }
+        // permission denied, boo!
         return hasLocationPermission;
     }
 
     private void requestPermission() {
+        //this method returns true if the app has requested this permission previously and the user denied the request.
+        //If the user turned down the permission request in the past and chose the Don't ask again option in the permission
+        // request system dialog, this method returns false. The method also returns false if a device policy prohibits the
+        // app from having that permission.
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            //// Show an expanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
             showDisabledLocationUI();
         } else {
+            // No explanation needed, we can request the permission.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
     }

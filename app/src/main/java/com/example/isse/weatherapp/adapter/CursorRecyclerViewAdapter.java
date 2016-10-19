@@ -124,6 +124,8 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
             mDataValid = true;
             notifyDataSetChanged();
+
+            //list is empty so setup empty view
             mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
 
         } else {

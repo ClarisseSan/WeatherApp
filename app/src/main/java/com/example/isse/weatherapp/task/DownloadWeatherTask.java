@@ -162,17 +162,18 @@ public class DownloadWeatherTask extends AsyncTask<Object, Object, String> {
     }
 
     @Override
-    protected void onPostExecute(String forecastJsonStr)
-    {
+    protected void onPostExecute(String forecastJsonStr) {
         Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
         if (cursor != null) {
+            //delete all contents of database to update data
             mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
             Log.v("onPostExecute", "Deleted.. couting again ");
             cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
-            Log.v("onPostExecute", cursor.getCount()+"");
+            Log.v("onPostExecute", cursor.getCount() + "");
             cursor.close();
         }
         try {
+            //insert values to db
             getForecastFromJSON(forecastJsonStr);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -201,7 +202,7 @@ public class DownloadWeatherTask extends AsyncTask<Object, Object, String> {
             String city = forecastJson.getJSONObject("city").getString("name");
             Log.e(LOG_TAG, "CITY --->" + city);
             //save city in shared pref
-            Utility.saveCity(mContext,city);
+            Utility.saveCity(mContext, city);
 
             JSONArray list = forecastJson.getJSONArray("list");
 
@@ -253,9 +254,9 @@ public class DownloadWeatherTask extends AsyncTask<Object, Object, String> {
                 Log.e(LOG_TAG, "HUMIDITY --->" + String.valueOf(humidity));
 
                 //sometimes rain is not available on API
-                if(dayForecast.has("rain")) {
+                if (dayForecast.has("rain")) {
                     rain = dayForecast.getDouble("rain");
-                }else{
+                } else {
                     rain = 0;
                 }
                 Log.e(LOG_TAG, "RAIN --->" + String.valueOf(rain));
