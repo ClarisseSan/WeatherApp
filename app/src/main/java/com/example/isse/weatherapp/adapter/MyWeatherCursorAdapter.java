@@ -38,6 +38,7 @@ import com.example.isse.weatherapp.utility.Utility;
 
 /**
  * Created by isse on 05/10/2016.
+ *
  */
 
 public class MyWeatherCursorAdapter extends CursorRecyclerViewAdapter<MyWeatherCursorAdapter.ViewHolder> {
